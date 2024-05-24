@@ -1,0 +1,49 @@
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore Python compiled files
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore virtual environment directories
+venv/
+.env/
+.venv/
+
+# Ignore Ansible retry files
+*.retry
+
+# Ignore temporary files
+*.log
+*.bak
+*.swp
+
+# Ignore IDE/editor specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore any custom scripts or setup files that are not part of the role
+setup.sh
+
+# Ignore test outputs or temporary directories
+test-output/
+tmp/
+
+# Ignore role dependency downloads
+roles/
+
+# Ignore the contents of the roles directory but not the directory itself
+roles/*/
+
+# Ignore GitHub Actions specific files (optional if you don't want to include workflows)
+# .github/
+
+# Ignore sensitive information
+*.pem
+*.key
+*.crt
+*.der
