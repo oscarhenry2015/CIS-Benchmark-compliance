@@ -22,10 +22,10 @@ jobs:
         sudo apt install -y ansible ansible-lint yamllint
 
     - name: Run yamllint
-      run: yamllint example.yml
+      run: yamllint audit.yml
 
     - name: Run ansible-lint
-      run: ansible-lint example.yml
+      run: ansible-lint audit.yml
 
     - name: Syntax check Ansible playbook
-      run: ansible-playbook --syntax-check example.yml
+      run: ansible-playbook --syntax-check audit.yml
