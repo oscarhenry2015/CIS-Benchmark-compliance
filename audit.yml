@@ -1,14 +1,11 @@
 ---
 - hosts: all_cisco_devices
-  gather_facts: true
+  gather_facts: false
   become: true
   become_method: enable
 
-  vars:
-    total_score: 0
-    aaa_new_model_score: 0
-    aaa_auth_login_score: 0
-    aaa_auth_enable_score: 0
+  vars_files:
+    - vars/scores.yml
 
   tasks:
     - name: Retrieve the running configuration
@@ -24,6 +21,11 @@
                not 'no aaa new-model' in run_config_output.stdout[0].splitlines()
             else 0
           }}
+
+    - name: Check if 'aaa authentication login' is configured [1 point]
+      set_fact:
+        aaa_auth_login_score: 1
+      when: "'aaa authentication login' in run_config_output.stdout[0]"
 
     - name: Check if 'aaa authentication enable' is configured [1 point]
       set_fact:
@@ -64,7 +66,6 @@
             1 if 'aaa accounting commands' in ' '.join(run_config_output.stdout)
             else 0
           }}
-
     - name: Check if 'aaa accounting connection' is configured
       set_fact:
         aaa_accounting_connection_score: >-
