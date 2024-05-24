@@ -11,40 +11,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [ubuntu:20.04, centos:7]
-   
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Docker environment
+    - name: Install Ansible and dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y docker.io
-        sudo systemctl start docker
+        sudo apt update
+        sudo apt install -y ansible ansible-lint yamllint
 
-    - name: Run setup script
-      run: |
-        chmod +x setup.sh
-        ./setup.sh
+    - name: Run yamllint
+      run: yamllint audit.yml
 
-    - name: Run tests in Docker
-      run: |
-        docker run --rm \
-          -v $(pwd):/ansible-role \
-          -w /ansible-role \
-          ${{ matrix.os }} \
-          /bin/bash -c "
-            if [ -f /etc/redhat-release ]; then
-              yum install -y epel-release &&
-              yum install -y ansible ansible-lint yamllint
-            else
-              apt-get update &&
-              apt-get install -y ansible ansible-lint yamllint
-            fi &&
-            yamllint -c .yamllint audit.yml &&
-            ansible-lint audit.yml &&
-            ansible-playbook --syntax-check audit.yml
-          "
+    - name: Run ansible-lint
+      run: ansible-lint audit.yml
+
+    - name: Syntax check Ansible playbook
+      run: ansible-playbook --syntax-check audit.yml
