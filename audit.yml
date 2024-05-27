@@ -5,7 +5,7 @@
   become_method: enable
 
   vars_files:
-    - vars/scores.yml
+    - roles/cis_audit_role/vars/scores.yml
 
   tasks:
     - name: Retrieve the running configuration
