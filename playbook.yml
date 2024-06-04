@@ -1,0 +1,23 @@
+---
+#playbook.yml
+- name: Get running configuration from Cisco switches
+  hosts: all_cisco_devices
+  gather_facts: false  # We don't need to gather facts for this task
+  become: true
+  become_method: enable
+
+  roles:
+    - role: config_role
+    - role: audit_role
+  vars:
+    ansible_become_pass: class
+
+  vars_files:
+    - audit_role/vars/scores.yml
+
+  tasks:
+    - name: AAA Configurations
+      include_tasks: /root/cis/config_role/tasks/aaa_config_playbook.yml
+
+    - name: Audit AAA Configurations
+      include_tasks: /root/cis/audit_role/tasks/aaa_audit_playbook.yml

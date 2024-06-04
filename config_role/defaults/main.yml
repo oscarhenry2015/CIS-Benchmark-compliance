@@ -1,0 +1,40 @@
+---
+# defaults file for configuration_role/defaults/main.yml
+
+aaa_radius_config:
+  server_name: "myradiusserver"
+  server_ip: "192.168.122.102"
+  key: "gns3"
+  group_name: "myradiusgroup"
+  aaa_list_name: "default"  # or the name of your AAA list
+
+aaa_tacacs_config:
+  server_name: "mytacacsgui"
+  server_ip: "192.168.122.101"
+  key: "tacacskey"
+  group_name: "mytacacsguigroup"
+  aaa_list_name: "default"  # or the name of your AAA list
+
+aaa_authentication_login:
+    list_name: "default"
+    group: "group"
+    method1: "myradiusgroup"
+    method2: "local"
+
+aaa_authentication_enable:
+    list_name: "default"
+    method1: "enable"
+    group: "group"
+    method2: "myradiusgroup"
+
+aaa_accounting_config:
+  list_name: "default"  # or your specific list name
+  method: "start-stop"  # or "stop-only", "none"
+  server_type: "group"
+  tacacs_server_group_name: "mytacacsguigroup"
+  accounting_types:
+    - commands 15
+    - connection
+    - exec
+    - network
+    - system
