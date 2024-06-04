@@ -1,0 +1,30 @@
+name: Ansible Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Ansible and dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y ansible ansible-lint yamllint
+
+    - name: Run yamllint
+      run: yamllint audit.yml
+
+    - name: Run ansible-lint
+      run: ansible-lint audit.yml
+
+    - name: Syntax check Ansible playbook
+      run: ansible-playbook --syntax-check audit.yml
