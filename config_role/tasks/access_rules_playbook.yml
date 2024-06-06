@@ -1,0 +1,73 @@
+---
+- name: 1.2.1 Set 'privilege 1' for local users [1 Point]
+  cisco.ios.ios_config:
+    lines:
+      - "username {{ item.username }} privilege 1 password {{ item.password }}"
+  loop: "{{ local_users }}"
+
+- name: 1.2.2 Set 'transport input ssh' for 'line vty' connections [1 Point]
+  cisco.ios.ios_config:
+    lines:
+      - "line vty 0 15"
+      - "transport input ssh"
+
+- name: 1.2.3 Set 'no exec' for 'line aux 0'
+  cisco.ios.ios_config:
+    lines:
+      - "no exec"
+    parents: "line aux 0"
+
+- name: 1.2.4 Create 'access-list' for use with 'line vty' [1 Point]
+  cisco.ios.ios_config:
+    lines:
+      - "access-list {{ vty_acl_config.vty_acl_number }} permit tcp {{ vty_acl_config.vty_acl_block_with_mask }} any"
+      - "access-list {{ vty_acl_config.vty_acl_number }} permit tcp host {{ vty_acl_config.vty_acl_host }} any"
+      - "access-list {{ vty_acl_config.vty_acl_number }} deny ip any any log"
+
+- name: 1.2.5 Set 'access-class' for 'line vty' [1 Point]
+  cisco.ios.ios_config:
+    lines:
+      - "access-class {{ vty_acl_config.vty_acl_number }} in"
+    parents: "line vty 0 15"
+
+- name: 1.2.6 - 1.2.10 Set 'exec-timeout' to less than or equal to 10 minutes for 'line aux, line con 0, line vty and tty' [4 Points]
+  cisco.ios.ios_config:
+    lines:
+      - exec-timeout {{ timeout_config.timeout_in_minutes }} {{ timeout_config.timeout_in_seconds }}
+    parents: "{{ item }}"
+  loop: "{{ timeout_config.lines }}"
+
+- name: 1.2.11 Set 'transport input none' for 'line aux 0' [1 Point]
+  cisco.ios.ios_config:
+    lines:
+      - transport input none
+    parents: line aux 0
+
+- name: Disable the default SNMP community string "private"
+  cisco.ios.ios_config:
+    lines: "no snmp-server community private"
+
+- name: Disable the default SNMP community string "public"
+  cisco.ios.ios_config:
+    lines: "no snmp-server community public"
+
+- name: Enable SNMP traps for authentication, linkup, linkdown, and coldstart
+  cisco.ios.ios_config:
+    lines:
+      - "snmp-server enable traps snmp authentication"
+      - "snmp-server enable traps snmp linkup"
+      - "snmp-server enable traps snmp linkdown"
+      - "snmp-server enable traps snmp coldstart"
+
+- name: Configure SNMP server hosts with trap community string
+  cisco.ios.ios_config:
+    lines: >
+      snmp-server host {{ item.ip_address }} {{ item.trap_community_string | default(default_trap_community_string) }}
+  loop: "{{ snmp_hosts }}"
+
+- name: Configure SNMPv3 users
+  cisco.ios.ios_config:
+    lines: |
+      {% for user in snmp_users %}
+      snmp-server user {{ user.username }} {{ snmp_default_user.group_name }} v3 auth {{ snmp_default_user.auth_protocol }} {{ user.auth_password }} priv {{ snmp_default_user.priv_protocol >
+      {% endfor %}

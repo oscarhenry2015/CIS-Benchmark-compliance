@@ -1,5 +1,5 @@
 ---
-# audit_role/aaa_audit_playbook.yml
+# cis/audit_role/aaa_audit_playbook.yml
 - name: Retrieve the running configuration
   ios_command:
     commands: show running-config

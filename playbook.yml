@@ -16,8 +16,17 @@
     - audit_role/vars/scores.yml
 
   tasks:
-    - name: AAA Configurations
-      include_tasks: /root/cis/config_role/tasks/aaa_config_playbook.yml
+    - name: AAA Rules Configurations
+      include_tasks: /root/cis_benchmark/configuration_role/tasks/aaa_config_playbook.yml
 
-    - name: Audit AAA Configurations
-      include_tasks: /root/cis/audit_role/tasks/aaa_audit_playbook.yml
+    - name: Access Rules Configurations
+      include_tasks: /root/cis_benchmark/configuration_role/tasks/access_rules_playbook.yml
+
+    - name: Banner Rules Configurations
+      include_tasks: /root/cis_benchmark/configuration_role/tasks/banner_rules_playbook.yml
+
+    - name: Password Rules Configurations
+      include_tasks: /root/cis_benchmark/configuration_role/tasks/password_rules_playbook.yml
+
+    - name: SNMP Rules Configurations
+      include_tasks: /root/cis_benchmark/configuration_role/tasks/snmp_rules_playbook.yml

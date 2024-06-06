@@ -2,10 +2,10 @@
 #configuration_role/tasks/aaa_config_playbook.yml
 
 # Pre Task 1
-- name: Configure enable password
+- name: Configure enable secret
   cisco.ios.ios_config:
     lines:
-      - enable password class
+      - enable secret class
 
 # Pre Task 2
 - name: Configure backup user
@@ -94,4 +94,4 @@
   cisco.ios.ios_config:
     lines:
       - "line vty 0 15"
-      - "transport input ssh"
+      - "transport input all"

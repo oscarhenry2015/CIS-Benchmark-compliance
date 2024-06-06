@@ -38,3 +38,27 @@ aaa_accounting_config:
     - exec
     - network
     - system
+
+timeout_config:
+  timeout_in_minutes: 10
+  timeout_in_seconds: 0
+  lines:
+    - line aux 0
+    - line console 0
+    - line vty 0 15
+
+default_trap_community_string: "defaultCommunity"
+snmp_hosts:
+  - ip_address: "192.168.1.1"
+  - ip_address: "192.168.1.2"
+  - ip_address: "192.168.1.3"
+    trap_community_string: "customCommunity"
+
+snmp_default_user:
+  group_name: "default_group"
+  auth_protocol: "sha"
+  auth_password: "default_auth_password"
+  priv_protocol: "aes"
+  priv_key_length: "128"
+  priv_password: "default_priv_password"
+  acl_name_or_number: "default_acl"
