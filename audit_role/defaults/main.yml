@@ -1,2 +1,16 @@
 ---
 # defaults file for audit_role
+vty_acl_number: 150
+timeout_config:
+  timeout_in_minutes: 9
+  timeout_in_seconds: 0
+  lines:
+    - line aux 0
+    - line console 0
+    - line vty 0 15
+
+snmp_groups:
+  - v3group
+#  - v3group2
+#  - v3group3
+# Add more SNMP groups as needed

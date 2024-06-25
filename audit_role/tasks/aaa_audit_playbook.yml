@@ -1,98 +1,124 @@
+#/root/cis_audit/audit_role/aaa_audit.yml
 ---
-# cis/audit_role/aaa_audit_playbook.yml
-- name: Retrieve the running configuration
-  ios_command:
-    commands: show running-config
-  register: run_config_output
+- name: Register output of 'show running-config | include aaa new-model'
+  cisco.ios.ios_command:
+    commands:
+      - show running-config | include aaa new-model
+  register: aaa_new_model_output
 
-- name: Check if 'aaa new-model' is enabled [1 point]
+- name: Score '1.1.1 Enable aaa new-model'
   set_fact:
     aaa_new_model_score: >-
       {{
-        1 if 'aaa new-model' in run_config_output.stdout[0].splitlines() and
-           not 'no aaa new-model' in run_config_output.stdout[0].splitlines()
-        else 0
+        0 if aaa_new_model_output.stdout[0] == '' or 'no aaa new-model' in aaa_new_model_output.stdout[0]
+        else 1
       }}
 
-- name: Check if 'aaa authentication login' is configured [1 point]
-  set_fact:
-    aaa_auth_login_score: 1
-  when: "'aaa authentication login' in run_config_output.stdout[0]"
-
-- name: Check if 'aaa authentication enable' is configured [1 point]
-  set_fact:
-    aaa_auth_enable_score: 1
-  when: "'aaa authentication enable' in run_config_output.stdout[0]"
-
-- name: Gather running configuration sections for lines
-  ios_command:
+- name: Register output of 'show running-config | include aaa authentication login'
+  cisco.ios.ios_command:
     commands:
-      - show running-config | sec line | incl login authentication
-  register: sec_line_output
+      - show running-config | include aaa authentication login
+  register: aaa_auth_output
 
-- name: Check for 'login authentication' for line con 0
+- name: Score 1.1.2 Enable 'aaa authentication login'
   set_fact:
-    aaa_login_auth_line_con_0: >-
-      {{
-        1 if 'line con 0' in sec_line_output.stdout[0]
-        else 0
-      }}
+    aaa_auth_login_score: "{{ 1 if aaa_auth_output.stdout_lines != [['']] else 0 }}"
 
-- name: Check for 'login authentication' for line vty 0 4
-  set_fact:
-    aaa_login_auth_line_vty: >-
-      {{
-        1 if 'line vty 0 4' in sec_line_output.stdout[0]
-        else 0
-      }}
+- name: Register output of 'show running-config | include aaa authentication enable'
+  cisco.ios.ios_command:
+    commands:
+      - show running-config | include aaa authentication enable
+  register: aaa_auth_output
 
-- name: Check for login authentication for 'line aux 0
+- name: Score 1.1.3 Enable 'aaa authentication enable default'
   set_fact:
-    aaa_login_auth_line_aux_0: >-
-      {{
-        1 if 'line aux 0' in sec_line_output.stdout[0]
-        else 0
-      }}
+    aaa_auth_enable_score: "{{ 1 if aaa_auth_output.stdout_lines != [['']] else 0 }}"
 
-- name: Check if 'aaa accounting commands' is configured
-  set_fact:
-    aaa_accounting_commands_score: >-
-      {{
-        1 if 'aaa accounting commands' in ' '.join(run_config_output.stdout)
-        else 0
-      }}
+#- name: Check for 'login authentication' for line con 0
+#  set_fact:
+#    aaa_login_auth_line_con_0: >-
+#      {{
+#        1 if 'line con 0' in sec_line_output.stdout[0]
+#        else 0
+#      }}
 
-- name: Check if 'aaa accounting connection' is configured
-  set_fact:
-    aaa_accounting_connection_score: >-
-      {{
-        1 if 'aaa accounting connection' in ' '.join(run_config_output.stdout)
-        else 0
-      }}
+#- name: Check for 'login authentication' for line vty 0 4
+#  set_fact:
+#    aaa_login_auth_line_vty: >-
+#      {{
+#        1 if 'line vty 0 4' in sec_line_output.stdout[0]
+#        else 0
+#      }}
 
-- name: Check if 'aaa accounting exec' is configured
-  set_fact:
-    aaa_accounting_exec_score: >-
-      {{
-        1 if 'aaa accounting exec' in ' '.join(run_config_output.stdout)
-        else 0
-      }}
+#- name: Check for login authentication for 'line aux 0
+#  set_fact:
+#    aaa_login_auth_line_aux_0: >-
+#      {{
+#        1 if 'line aux 0' in sec_line_output.stdout[0]
+#        else 0
+#      }}
 
-- name: Check if 'aaa accounting network' is configured
-  set_fact:
-    aaa_accounting_network_score: >-
-      {{
-        1 if 'aaa accounting network' in ' '.join(run_config_output.stdout)
-        else 0
-      }}
+- name: Register output of 'show run | include aaa accounting commands'
+  cisco.ios.ios_command:
+    commands:
+      - show run | include aaa accounting commands
+  register: aaa_accounting_commands_output
 
-- name: Check if 'aaa accounting system' is configured
+- name: Score 1.1.7 Set 'aaa accounting' to log all privileged use commands using 'commands 15'
   set_fact:
-    aaa_accounting_system_score: >-
-      {{
-        1 if 'aaa accounting system' in ' '.join(run_config_output.stdout)
-        else 0
-      }}
+    aaa_accounting_commands_score: "{{ 1 if aaa_accounting_commands_output.stdout[0] != '' else 0 }}"
+
+- name: Register output of 'show run | include aaa accounting connection'
+  cisco.ios.ios_command:
+    commands:
+      - show run | include aaa accounting connection
+  register: aaa_accounting_connection_output
+
+- name: Score 1.1.8 Set 'aaa accounting connection'
+  set_fact:
+    aaa_accounting_connection_score: "{{ 1 if aaa_accounting_connection_output.stdout[0] != '' else 0 }}"
+
+- name: Register output of 'show run | include aaa accounting exec'
+  cisco.ios.ios_command:
+    commands:
+      - show run | include aaa accounting exec
+  register: aaa_accounting_exec_output
+
+- name: Score 1.1.9 Set 'aaa accounting exec'
+  set_fact:
+    aaa_accounting_exec_score: "{{ 1 if aaa_accounting_exec_output.stdout[0] != '' else 0 }}"
+
+- name: Register output of 'show run | include aaa accounting network'
+  cisco.ios.ios_command:
+    commands:
+      - show run | include aaa accounting network
+  register: aaa_accounting_network_output
+
+- name: Score 1.1.10 Set 'aaa accounting network'
+  set_fact:
+    aaa_accounting_network_score: "{{ 1 if aaa_accounting_network_output.stdout[0] != '' else 0 }}"
+
+- name: Register output of 'show run | include aaa accounting system'
+  cisco.ios.ios_command:
+    commands:
+      - show run | include aaa accounting system
+  register: aaa_accounting_system_output
+
+- name: Score 1.1.11 Set 'aaa accounting system'
+  set_fact:
+    aaa_accounting_system_score: "{{ 1 if aaa_accounting_system_output.stdout[0] != '' else 0 }}"
+
+- name: Debug Results
+  debug:
+    msg:
+      - "aaa_new_model_score: {{ aaa_new_model_score }}"
+      - "aaa_auth_login_score: {{ aaa_auth_login_score }}"
+      - "aaa_auth_enable_score: {{ aaa_auth_enable_score }}"
+      - "aaa_accounting_commands_score: {{ aaa_accounting_commands_score}}"
+      - " aaa_accounting_connection_score: {{ aaa_accounting_connection_score }}"
+      - " aaa_accounting_exec_score: {{ aaa_accounting_exec_score }}"
+      - " aaa_accounting_network_score: {{ aaa_accounting_network_score }}"
+      - " aaa_accounting_system_score: {{ aaa_accounting_system_score }}"
 
 - name: Calculate total score
   set_fact:
@@ -102,9 +128,6 @@
         aaa_new_model_score | int +
         aaa_auth_login_score | int +
         aaa_auth_enable_score | int +
-        aaa_login_auth_line_con_0 | int +
-        aaa_login_auth_line_aux_0 | int +
-        aaa_login_auth_line_vty | int +
         aaa_accounting_commands_score | int +
         aaa_accounting_connection_score | int +
         aaa_accounting_exec_score | int +
@@ -114,4 +137,5 @@
 
 - name: Print the final total score
   debug:
-    msg: "The final total score is {{ total_score }}"
+    msg: "The total score is {{ total_score }}"
+
